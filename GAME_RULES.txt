@@ -1,0 +1,29 @@
+Ideja:
+Ideja igre se bazira na sukobima mačevima i ostalim hladnim oružjem između "klanova"
+
+- Sukobljavaju se dvije vojske sa manjim brojem vojnika (tako da svakog od njih možemo nazvati imenom)
+- sukob se odvija na polju koje je podjeljeno na kvadrante
+- u svakom kvadrantu se sukobljavaju samo vojnici koji se nalaze u tom kvadrantu te ovisno o svojstvima i brojnosti nanose gubitke drugoj strani
+
+Vojska se sastoji od vojnika
+Svaki vojnik ima svojstva kao što su: energija, iskustvo, život, snaga, hrabrost, discipliniranost
+- energija se troši kretanjem iz jednog u drugi kvadrant, sukobom sa protivnikom. kada vojnik ostane bez energije, više nije sposoban za borbu
+- iskustvo pojačava energiju, snagu i život (sporije se troše)
+- život - smanjuje se pri svakom ciklusu u kojem vojnik sudjeluje u sukobu, kada se potroši, vojnik umire
+- snaga - smanjuje se smanjenjem energije (uslijed umora), o njoj ovisi koliko će vojnik naštetiti drugoj strani
+- hrabrost - ovisno o hrabrosti, vojnik će izbjegavati ulazak u sukob u kvadrantima gdje su neprijateljski vojnici jači, smanjuje se svakim ubijenim suborcem u kvadrantu, kada ostane bez hrabrosti, vojnik dezertira
+==> vojnik može biti u stanjima: Alive, Tired (nema energije), Fleed (izgubio hrabrost), Dead (izgubio život)
+
+Bitka:
+- odvija se u ciklusima
+- počinje tako da svaka vojska stoji držeći određenu formaciju na istoj udaljenosti od neke "nulte" točke
+- pripadnici vojski se kreću jedni prema drugima kroz cikluse
+- kada se vojske susretnu, počinje borba
+- vojnici se susretnu onog trenutka kada uđu isti kvadrant
+
+Pravila:
+- u svakom ciklusu izračunavamo gubitak svojstava svakog od vojnika
+- smanjnjenje svojstava ovisi o ukupnoj snazi suboraca i ukupnoj snazi neprijatelja koji se nalaze u istom kvadrantu 8više vojnika može biti u istom kvadrantu)
+- ako se vojnik nalazi u kvadrantu gdje nema neprijatelja, napreduje prema kvadrantu u kojem ima neprijatelja osim ako je u stanjima Tired, Fleed ili Dead
+
+Bitka završava kada svi vojnici jedne od vojski poginu (Dead), pobjegnu (Fleed) ili odustanu (Tired)
