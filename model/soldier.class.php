@@ -39,6 +39,8 @@ class Soldier{
 			$this->_energy = 0;
 		}
 		
+		// @todo log if soldiers give up (energy==0)
+		
 		return $this->_energy;
 	}
 	
@@ -56,6 +58,7 @@ class Soldier{
 			$this->_life = 0;
 		}
 	
+		// @todo log if soldier dies
 		return $this->_life;
 	}
 	
@@ -73,6 +76,8 @@ class Soldier{
 			$this->_bravery = 0;
 		}
 	
+		// @todo log if soldier flees
+		
 		return $this->_bravery;
 	}
 	
@@ -87,10 +92,12 @@ class Soldier{
 	public function move($x, $y){
 		$this->_pos_x += $x;
 		$this->_pos_y += $y;
+		
+		// @todo log move
 	}
 	
 	public function gave_up(){
-		return $this->_energy > 0;
+		return !($this->_energy > 0);
 	}
 	
 	public function is_alive(){

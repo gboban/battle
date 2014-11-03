@@ -33,5 +33,19 @@ class Army{
 	public function get_name(){
 		return $this->_army_name;
 	}
+	
+	public function get_soldiers(){
+		// return shallow copy of soldiers array?	
+		return $this->_soldiers;
+	}
+	
+	/*
+	 * position army at given distance from [0][0]
+	 */
+	public function position_army($distance){
+		
+	}
+	
+	// @todo check if army can fight (there are soldier who are alive and didn't fleed or gave up)
 }
 ?>
