@@ -27,3 +27,6 @@ Pravila:
 - ako se vojnik nalazi u kvadrantu gdje nema neprijatelja, napreduje prema kvadrantu u kojem ima neprijatelja osim ako je u stanjima Tired, Fleed ili Dead
 
 Bitka završava kada svi vojnici jedne od vojski poginu (Dead), pobjegnu (Fleed) ili odustanu (Tired)
+
+Ispis:
+- na ispisu se daju podaci o tome tko je poginuo, pobjegao ili odustao od daljnje borbe i koliko je preostalih vojnika u borbi sa svake strane
