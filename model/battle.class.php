@@ -39,15 +39,28 @@ class Battle{
 		/*
 		 * sets positions of armies
 		 */
+		$this->_army_a->position_army(-1);
+		$this->_army_b->position_army(1);
+	}
+	
+	protected function confront_armies($cycle){
+		// group soldiers by battleground coordinates
+		
 	}
 	
 	public function run($log){
-		$cycle = 0;
+		$cycle = 1;
 		$ended = false;
 		
 		while(!$ended){
+			$log[$cycle] = array();
 			
+			$this->confront_armies($cycle);
+			
+			++$cycle;
 		}
+		
+		return $log;
 	}
 }
 ?>

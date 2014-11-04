@@ -1,5 +1,5 @@
 <?php
 $ARMY_NAMES = array(
-	"plavi",
-	"crveni"	
+	"Northern Willage",
+	"Southern Willage"	
 );

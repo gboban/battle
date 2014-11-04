@@ -5,6 +5,8 @@ class Soldier{
 	private $_pos_x = 0;
 	private $_pos_y = 0;
 	
+	private $_cycle = 0;
+	
 	/*
 	 * all values must range 0..100
 	 */
@@ -23,6 +25,14 @@ class Soldier{
 		$this->_life = $life;
 		$this->_strength = $strength;
 		$this->_bravery = $bravery;	
+	}
+	
+	function get_cycle(){
+		return $this->_cycle;
+	}
+	
+	function set_cycle($a_cycle){
+		$this->_cycle = $acycle;
 	}
 	
 	public function get_name(){
@@ -75,10 +85,13 @@ class Soldier{
 		if($this->_bravery < 0){
 			$this->_bravery = 0;
 		}
-	
-		// @todo log if soldier flees
 		
 		return $this->_bravery;
+	}
+	
+	public function set_xy($x, $y){
+		$this->_pos_x = $x;
+		$this->_pos_y = $y;
 	}
 	
 	public function get_x(){
@@ -93,7 +106,8 @@ class Soldier{
 		$this->_pos_x += $x;
 		$this->_pos_y += $y;
 		
-		// @todo log move
+		// decrement energy
+		$this->_energy -= 1;
 	}
 	
 	public function gave_up(){
@@ -104,8 +118,20 @@ class Soldier{
 		return $this->_life > 0;
 	}
 	
+	public function is_dead(){
+		return !$this->_is_alive();
+	}
+	
 	public function has_fleed(){
 		return $this->_bravery > 0;
+	}
+	
+	public function can_fight(){
+		if($this->gave_up()) return false;
+		if($this->is_dead()) return false;
+		if($this->has_fleed()) return false;
+
+		return true;
 	}
 }
 ?>
