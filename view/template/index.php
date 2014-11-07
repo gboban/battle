@@ -66,7 +66,7 @@ foreach($cowards1 as $soldier){
 <hr />
 <?php 
 	$army2 = $this->_data["report"]["army2"];
-	$survivors12 = $army2->get_survivors();
+	$survivors2 = $army2->get_survivors();
 	$indolents2 = $army2->get_indolents();
 	$cowards2 = $army2->get_cowards();
 	$heroes2 = $army2->get_deceased_heroes();

@@ -71,7 +71,11 @@ class Army{
 	public function get_survivors(){
 		$survivors = array();
 		foreach($this->_soldiers as $soldier){
-			if($soldier->is_alive() && !$soldier->gave_up() && !$soldier->has_fleed()){
+			if(
+					$soldier->is_alive() &&
+					!$soldier->gave_up() &&
+					!$soldier->has_fleed()
+					){
 				$survivors[] = $soldier;
 			}
 		}
