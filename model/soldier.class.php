@@ -39,6 +39,10 @@ class Soldier{
 		return $this->_name;
 	}
 	
+	public function get_army(){
+		return $this->_army_name;
+	}
+	
 	public function get_energy(){
 		return $this->_energy;
 	}
@@ -123,7 +127,7 @@ class Soldier{
 	}
 	
 	public function has_fleed(){
-		return $this->_bravery > 0;
+		return $this->_bravery == 0;
 	}
 	
 	public function can_fight(){
