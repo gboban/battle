@@ -1,5 +1,5 @@
 <?php
-class View{
+class Index{
 	private $_data = null;
 	private $_template = null;
 	

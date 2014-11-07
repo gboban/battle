@@ -1,4 +1,6 @@
 <?php
+require("soldier.class.php");
+
 class Army{
 	private $_army_name = "";
 	private $_soldiers;

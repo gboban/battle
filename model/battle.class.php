@@ -26,6 +26,8 @@
  *  
  *  
  */
+require("army.class.php");
+
 class Battle{
 	private $_army_a = null;
 	private $_army_b = null;
@@ -238,6 +240,20 @@ class Battle{
 		while(!$ended){
 			$cycle_log = $this->confront_armies($cycle);
 			$log[$cycle] = $cycle_log;
+			
+			$army1_lost = !$this->_army_a->can_fight();
+			$army2_lost = !$this->_army_b->can_fight();
+			
+			if($army1_lost && $army2_lost){
+				$ended = true;
+				array_push($log, "Armies exterminated each other");
+			}elseif($army1_lost){
+				$ended = true;
+				array_push($log, $this->_army_a->get_name() . " lost battle");
+			}elseif($army2_lost){
+				$ended = true;
+				array_push($log, $this->_army_b->get_name() . " lost battle");
+			}
 			
 			++$cycle;
 		}
