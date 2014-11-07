@@ -16,7 +16,8 @@ class Soldier{
 	private $_strength = 0;
 	private $_bravery = 0;
 	
-	public function __construct($name, $energy, $experience, $life, $strength, $bravery){
+	public function __construct($army_name, $name, $energy, $experience, $life, $strength, $bravery){
+		$this->_army_name = $army_name;
 		$this->_name = $name;
 		
 		// @todo add verification thart values are between 0 and 100 inclusive
@@ -25,6 +26,20 @@ class Soldier{
 		$this->_life = $life;
 		$this->_strength = $strength;
 		$this->_bravery = $bravery;	
+	}
+	
+	public function to_string(){
+		$str = $this->_name . " of " . $this->_army_name;
+		
+		$str .= "(";
+		$str .= "energy: " . $this->_energy;
+		$str .= ", experience: " . $this->_experience;
+		$str .= ", life: " . $this->_life;
+		$str .= ", strength: " . $this->_strength;
+		$str .= ", bravery: " . $this->_bravery;
+		$str .= ")";
+		
+		return $str;
 	}
 	
 	function get_cycle(){
@@ -53,8 +68,6 @@ class Soldier{
 			$this->_energy = 0;
 		}
 		
-		// @todo log if soldiers give up (energy==0)
-		
 		return $this->_energy;
 	}
 	
@@ -72,7 +85,6 @@ class Soldier{
 			$this->_life = 0;
 		}
 	
-		// @todo log if soldier dies
 		return $this->_life;
 	}
 	
@@ -106,12 +118,17 @@ class Soldier{
 		return $this->_pos_y;
 	}
 	
+	public function set_position($x, $y){
+		$this->_pos_x = $x;
+		$this->_pos_y = $y;
+	}
+	
 	public function move($x, $y){
 		$this->_pos_x += $x;
 		$this->_pos_y += $y;
 		
 		// decrement energy
-		$this->_energy -= 1;
+		//$this->_energy -= 1;
 	}
 	
 	public function gave_up(){
@@ -123,7 +140,7 @@ class Soldier{
 	}
 	
 	public function is_dead(){
-		return !$this->_is_alive();
+		return !$this->is_alive();
 	}
 	
 	public function has_fleed(){

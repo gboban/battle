@@ -5,10 +5,10 @@ class Army{
 	private $_army_name = "";
 	private $_soldiers;
 	
-	public function __construct($army_name, $nrofsoldiers){
+	public function __construct($army_name, $nrofsoldiers, $WARRIOR_NAMES){
 		
 		if($nrofsoldiers > count($WARRIOR_NAMES)){
-			throw new Exception("Not enough names for given number of soldiers");
+			throw new Exception("Not enough names for given number of soldiers (maximum number: ".count($WARRIOR_NAMES).")");
 		}
 		
 		$this->_army_name = $army_name;
@@ -29,6 +29,8 @@ class Army{
 				rand(0, 100),		// strength
 				rand(0, 100)		// bravery
 			);
+			
+			$this->_soldiers[] = $new_soldier;
 		}
 	}
 	
@@ -64,6 +66,50 @@ class Army{
 		}
 		
 		return false;
+	}
+	
+	public function get_survivors(){
+		$survivors = array();
+		foreach($this->_soldiers as $soldier){
+			if($soldier->is_alive() && !$soldier->gave_up() && !$soldier->has_fleed()){
+				$survivors[] = $soldier;
+			}
+		}
+		
+		return $survivors;
+	}
+	
+	public function get_indolents(){
+		$indolents = array();
+		foreach($this->_soldiers as $soldier){
+			if($soldier->gave_up()){
+				$indolents[] = $soldier;
+			}
+		}
+		
+		return $indolents;
+	}
+	
+	public function get_cowards(){
+		$cowards = array();
+		foreach($this->_soldiers as $soldier){
+			if($soldier->has_fleed()){
+				$cowards[] = $soldier;
+			}
+		}
+		
+		return $cowards;
+	}
+	
+	public function get_deceased_heroes(){
+		$deceased = array();
+		foreach($this->_soldiers as $soldier){
+			if($soldier->is_dead()){
+				$deceased[] = $soldier;
+			}
+		}
+		
+		return $deceased;
 	}
 }
 ?>

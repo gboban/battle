@@ -32,31 +32,27 @@ class Battle{
 	private $_army_a = null;
 	private $_army_b = null;
 	
-	public function __construct($army1name, $army2name, $army1number, $army2number){
-		$this->_army_a = new Army($army1name, $army1number);
-		$this->_army_b = new Army($army2name, $army2number);
-	}
-	
-	protected function initialize(){
-		/*
-		 * sets positions of armies
-		 */
+	public function __construct($army1name, $army2name, $army1number, $army2number, $WARRIOR_NAMES){
+		$this->_army_a = new Army($army1name, $army1number, $WARRIOR_NAMES);
+		$this->_army_b = new Army($army2name, $army2number, $WARRIOR_NAMES);
+		
 		$this->_army_a->position_army(-1);
 		$this->_army_b->position_army(1);
 	}
 	
 	protected function confront_armies($cycle){
 		// group soldiers by battleground coordinates
-		
+		//print("confront " . $cycle . "<br />");
 		$cycle_log = array();
 		
 		$coord = array();
 		$army1 = $this->_army_a->get_soldiers();
+
 		$sumx1 = 0;
 		$sumy1 = 0;
 		$count1 = 0;
 		foreach($army1 as $soldier){
-			if($soldier->can_figth()){
+			if($soldier->can_fight()){
 				$x = $soldier->get_x();
 				$y = $soldier->get_y();
 				
@@ -64,13 +60,16 @@ class Battle{
 				$sumy1 += $y;
 				++$count1;
 				
-				$key = (string)$x + ':' + (string)$y;
+				$key = (string)$x . ':' . (string)$y;
 				
 				if(!in_array($key, array_keys($coord))){
-					$coord[$key] = array("army1"=>array());
+					$coord[$key] = array();
+				}
+				if(!in_array("army1", array_keys($coord[$key]))){
+					$coord[$key]["army1"] = array();
 				}
 				
-				array_push($coord[$key]["army1"], $soldier);
+				$coord[$key]["army1"][] = $soldier;
 			}	
 		}
 			
@@ -79,7 +78,7 @@ class Battle{
 		$sumy2 = 0;
 		$count2 = 0;
 		foreach($army2 as $soldier){
-			if($soldier->can_figth()){
+			if($soldier->can_fight()){
 				$x = $soldier->get_x();
 				$y = $soldier->get_y();
 		
@@ -87,178 +86,206 @@ class Battle{
 				$sumy2 += $y;
 				++$count2;
 				
-				$key = (string)$x + ':' + (string)$y;
+				$key = (string)$x . ':' . (string)$y;
 		
 				if(!in_array($key, array_keys($coord))){
-					$coord[$key] = array("army2"=>array());
+					$coord[$key] = array();
+				}
+				if(!in_array("army2", array_keys($coord[$key]))){
+					$coord[$key]["army2"] = array();
 				}
 		
-				array_push($coord[$key]["army2"], $soldier);
+				$coord[$key]["army2"][] = $soldier;
 			}
 		}
 		
-		// army centers
-		$army1_x = $sumx1 / $count1;
-		$army1_y = $sumy1 / $count1;
+		// army centers - armies should fight around "ground zero"
+		$army1_x = 0;
+		$army1_y = 0;
 
-		$army2_x = $sumx2 / $count2;
-		$army2_y = $sumy2 / $count2;
-		
+		$army2_x = 0;
+		$army2_y = 0;
+
 		foreach($coord as $xy){
+			//var_dump($coord);
+			//print("<hr />");
+			//die("block");
 			// calculate total strength of army1 at present coordinates
 			$strength1 = 0;
-			foreach($xy["army1"] as $soldier){
-				$strength1 += $soldier->get_strength();
+			if(in_array("army1", array_keys($xy))){
+				foreach($xy["army1"] as $soldier){
+					$strength1 += $soldier->get_strength();
+				}
 			}
 			
 			// calculate total strength of army2 at present coordinates
 			$strength2 = 0;
-			foreach($xy["army2"] as $soldier){
-				$strength2 += $soldier->get_strength();
-			}			
-		}
-		
-		// compare strengths
-		if($strength2 == 0){
-			//move army 2
-			foreach($xy["army2"] as $soldier){
-				$soldier->decrease_energy(1);
-				
-				// move toward of the center of army 1
-				$x = $soldier->get_x();
-				$x = $soldier->get_y();
-				
-				if(abs($x - $army1_x) > abs($y - $army1_y)){
-					$mx = abs($x - $army1_x) * abs($x - $army1_x) / ($x - $army1_x);
-					$my = 0;
-				}elseif(abs($x - $army1_x) < abs($y - $army1_y)){
-					$mx = 0;
-					$my = abs($y - $army1_y) * abs($y - $army1_y) / ($y - $army1_y);
-				}else{
-					$mx = abs($x - $army1_x) * abs($x - $army1_x) / ($x - $army1_x);
-					$my = abs($y - $army1_y) * abs($y - $army1_y) / ($y - $army1_y);
-				}
+			if(in_array("army2", array_keys($xy))){
+				foreach($xy["army2"] as $soldier){
+					$strength2 += $soldier->get_strength();
+				}	
+			}	
 
-				$soldier->move($mx, $my);
-				array_push($cycle_log, $soldier->get_name() . " of " . $soldier->get_army() . " moved forward");
-			}
-		}elseif($strength1 == 0){
-			// move army 1	
-			foreach($xy["army1"] as $soldier){
-				$soldier->decrease_energy(1);
+			// compare strengths
+			if($strength1 == 0){
+				//move army 2 (there is no enemy)
+				if(in_array("army2", array_keys($xy))){
+					foreach($xy["army2"] as $soldier){
+						$soldier->decrease_energy(1);
+							
+						// move toward of the center of army 1
+						$x = $soldier->get_x();
+						$y = $soldier->get_y();
+							
+						if(abs($x - $army1_x) > abs($y - $army1_y)){
+							$mx = ($army1_x - $x) / abs($x - $army1_x);
+							$my = 0;
+						}elseif(abs($army1_x - $x) < abs($y - $army1_y)){
+							$mx = 0;
+							$my = ($army1_y - $y) / abs($y - $army1_y);
+						}else{
+							$mx = ($army1_x - $x) / abs($x - $army1_x);
+							$my = ($army1_y - $y) / abs($y - $army1_y);
+						}
 			
-				// move toward of the center of army 1
-				$x = $soldier->get_x();
-				$x = $soldier->get_y();
-			
-				if(abs($x - $army1_x) > abs($y - $army1_y)){
-					$mx = abs($x - $army1_x) * abs($x - $army1_x) / ($x - $army1_x);
-					$my = 0;
-				}elseif(abs($x - $army1_x) < abs($y - $army1_y)){
-					$mx = 0;
-					$my = abs($y - $army1_y) * abs($y - $army1_y) / ($y - $army1_y);
-				}else{
-					$mx = abs($x - $army1_x) * abs($x - $army1_x) / ($x - $army1_x);
-					$my = abs($y - $army1_y) * abs($y - $army1_y) / ($y - $army1_y);
+						$soldier->move($mx, $my);
+						array_push($cycle_log, $soldier->to_string() . " moved forward to (".$mx . ", " . $my.")" . $soldier->get_x() . ", " . $soldier->get_y());
+					}
 				}
+			}elseif($strength2 == 0){
+				// move army 1
+				if(in_array("army1", array_keys($xy))){
+					foreach($xy["army1"] as $soldier){
+						$soldier->decrease_energy(1);
 			
-				$soldier->move($mx, $my);
-				array_push($cycle_log, $soldier->get_name() . " of " . $soldier->get_army() . " moved forward");
-			}
-		}else{
-			// comfront armies (update life, energy), stay at position
-			/*
-			 * quick rules:
-			 * in combat, soldier looses 2pt of energy
-			 * if on stronger side, looses 1pt of life
-			 * if on weaker side, looses 2pt of life
-			 */
-			$army1_deaths = 0;
-			foreach($xy["army1"] as $soldier){
-				if($strength1 >= $strength2){
-					$soldier->decrease_energy(2);
-					$soldier_decrease_life(1);
-		
-				}elseif($strength1 < $strength2){
-					$soldier->decrease_energy(2);
-					$soldier_decrease_life(2);
+						// move toward of the center of army 1
+						$x = $soldier->get_x();
+						$y = $soldier->get_y();
+			
+						if(abs($x - $army1_x) > abs($y - $army1_y)){
+							$mx = ($army1_x - $x) / abs($x - $army1_x);
+							$my = 0;
+						}elseif(abs($x - $army1_x) < abs($y - $army1_y)){
+							$mx = 0;
+							$my = ($army1_y- $y) / abs($y - $army1_y);
+						}else{
+							$mx = ($army1_x- $x) / abs($x - $army1_x);
+							$my = ($army1_y - $y) / abs($y - $army1_y);
+						}
+			
+						$soldier->move($mx, $my);
+						array_push($cycle_log, $soldier->to_string() . " moved forward to (".$mx . ", " . $my.")" . $soldier->get_x() . ", " . $soldier->get_y());
+					}
+				}
+			}else{
+				// comfront armies (update life, energy), stay at position
+				/*
+				 * quick rules:
+				* in combat, soldier looses 2pt of energy
+				* randomly, reduce life for each strength point on the oposite side
+				* 
+				*/
+				$army1_deaths = 0;
+				if(in_array("army1", array_keys($xy))){
+					for($i = 0; $i < $strength2; ++$i){
+						$r = rand(0, count($xy["army1"])-1);
+						$soldier = $xy["army1"][$r];
+						$soldier->decrease_life(1);
+					}
 					
+					foreach($xy["army1"] as $soldier){
+						$soldier->decrease_energy(2);
+							
+						if($soldier->is_dead()){
+							array_push($cycle_log, $soldier->to_string() . " died in combat");
+							$army1_deaths += 1;
+						}elseif($soldier->gave_up()){
+							array_push($cycle_log, $soldier->to_string() . " gave up the battle");
+						}
+					}
 				}
-				
-				if($soldier->is_dead()){
-					array_push($cycle_log, $soldier->get_name() . " of " . $soldier->get_army() . " died in combat");
-					$army1_deaths += 1;
-				}elseif($soldier->gave_up()){
-					array_push($cycle_log, $soldier->get_name() . " of " . $soldier->get_army() . " gave up the battle");
-				}
-			}
-			
-			
-			$army2_deaths = 0;
-			foreach($xy["army2"] as $soldier){
-				if($strength2 >= $strength1){
-					$soldier->decrease_energy(2);
-					$soldier_decrease_life(1);
-			
-				}elseif($strength2 < $strength2){
-					$soldier->decrease_energy(2);
-					$soldier_decrease_life(2);
+					
+				$army2_deaths = 0;
+				if(in_array("army2", array_keys($xy))){
+					for($i = 0; $i < $strength1; ++$i){
+						$r = rand(0, count($xy["army2"])-1);
+						$soldier = $xy["army2"][$r];
+						$soldier->decrease_life(1);
+					}
 						
-				}
+					foreach($xy["army2"] as $soldier){
+						$soldier->decrease_energy(2);
 			
-				if($soldier->is_dead()){
-					array_push($cycle_log, $soldier->get_name() . " of " . $soldier->get_army() . " died in combat");
-					$army2_deaths += 1;
-				}elseif($soldier->gave_up()){
-					array_push($cycle_log, $soldier->get_name() . " of " . $soldier->get_army() . " gave up the battle");
+						if($soldier->is_dead()){
+							array_push($cycle_log, $soldier->to_string() . " died in combat");
+							$army2_deaths += 1;
+						}elseif($soldier->gave_up()){
+							array_push($cycle_log, $soldier->to_string() . " gave up the battle");
+						}
+					}
 				}
-			}
-			
-			// reduce bravery for each army
-			foreach($xy["army1"] as $soldier){
-				$soldier->decrease_bravery($army1_deaths);
-				if($soldiet->has_fleed()){
-					array_push($cycle_log, "coward, " . $soldier->get_name() . " of " . $soldier->get_army() . " fleed the battle");
+					
+				// reduce bravery for each army
+				if(in_array("army1", array_keys($xy))){
+					foreach($xy["army1"] as $soldier){
+						$soldier->decrease_bravery($army1_deaths);
+						if($soldier->has_fleed()){
+							array_push($cycle_log, "coward, " . $soldier->to_string() . " fleed the battle");
+						}
+					}
 				}
-			}
-			
-			foreach($xy["army2"] as $soldier){
-				$soldier->decrease_bravery($army2_deaths);
-				if($soldiet->has_fleed()){
-					array_push($cycle_log, "coward, " . $soldier->get_name() . " of " . $soldier->get_army() . " fleed the battle");
+					
+				if(in_array("army2", array_keys($xy))){
+					foreach($xy["army2"] as $soldier){
+						$soldier->decrease_bravery($army2_deaths);
+						if($soldier->has_fleed()){
+							array_push($cycle_log, "coward, " . $soldier->to_string() . " fleed the battle");
+						}
+					}
 				}
 			}
 		}
 		
+		//var_dump($cycle_log);
+		//print("<hr />");
 		return $cycle_log;
 	}
 	
-	public function run($log){
+	public function run(){
+		$data = array();
 		$cycle = 1;
 		$ended = false;
 		
+		$cycle_log = array();
 		while(!$ended){
-			$cycle_log = $this->confront_armies($cycle);
-			$log[$cycle] = $cycle_log;
+			$cycle_log[] = $this->confront_armies($cycle);
 			
 			$army1_lost = !$this->_army_a->can_fight();
 			$army2_lost = !$this->_army_b->can_fight();
 			
+			$report = array();
 			if($army1_lost && $army2_lost){
 				$ended = true;
-				array_push($log, "Armies exterminated each other");
+				$report[] = "There is no winning side - all soldiers, from both armies, died, fleed or gave up the battle";
 			}elseif($army1_lost){
 				$ended = true;
-				array_push($log, $this->_army_a->get_name() . " lost battle");
+				$report[] = $this->_army_b->get_name() . " won the battle";
 			}elseif($army2_lost){
 				$ended = true;
-				array_push($log, $this->_army_b->get_name() . " lost battle");
+				$report[] = $this->_army_a->get_name() . " won the battle";
 			}
-			
+
 			++$cycle;
 		}
+		//var_dump($log);
+		$data["log"] = $cycle_log;
+		$data["report"] = array();
+		$data["report"]["result"] = array();
+		$data["report"]["result"] = $report;
+		$data["report"]["army1"] = $this->_army_a;
+		$data["report"]["army2"] = $this->_army_b;
 		
-		return $log;
+		return $data;
 	}
 }
 ?>

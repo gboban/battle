@@ -22,9 +22,18 @@ try{
 	$army2 = 0;
 }
 
-$battle = new Battle($ARMY_NAMES[0], $ARMY_NAMES[1], $army1, $army2);
-$log = $battle->run();
+if(($army1==0) && ($army2==0)){
+	die("Call with army1=x&army2=y");
+}
 
-$v = new Index('template/index.php', $log);
-$v->render();
+try{
+	$battle = new Battle($ARMY_NAMES[0], $ARMY_NAMES[1], $army1, $army2, $WARRIOR_NAMES);
+	$log = $battle->run();
+	//var_dump($log);
+	$v = new Index('template/index.php', $log);
+	$v->render();
+}catch(Exception $e){
+	die($e->getMessage());
+}
+
 ?>
